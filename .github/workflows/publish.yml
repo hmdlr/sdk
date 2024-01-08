@@ -1,4 +1,4 @@
-name: Release Announcement
+name: Deploy SDK
 on:
   push:
     branches:
@@ -13,7 +13,7 @@ jobs:
           github_token: ${{ secrets.ACCESS_TOKEN }}
           default_bump: patch
           release_branches: main
-          tag_prefix: ''
+          tag_prefix: ""
           annotated_tag: false
           create_annotated_tag: false
           tag_message: ${{ github.event.head_commit.message }}
@@ -24,8 +24,8 @@ jobs:
           release_name: ${{ github.event.head_commit.message }}
           prerelease: false
           draft: false
-          files: ''
-          extra_files: ''
+          files: ""
+          extra_files: ""
           commit_user_name: github-actions
 
   update-package:
@@ -48,11 +48,11 @@ jobs:
             chore(release): bump to ${{ env.LATEST_TAG }}
           CI_COMMIT_AUTHOR: github-actions[bot]
         run: |
-            git config --local user.name "${{ env.CI_COMMIT_AUTHOR }}"
-            git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add package.json package-lock.json
-            git commit -m "${CI_COMMIT_MESSAGE}"
-            git push
+          git config --local user.name "${{ env.CI_COMMIT_AUTHOR }}"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json
+          git commit -m "${CI_COMMIT_MESSAGE}"
+          git push
 
   publish:
     needs: update-package
@@ -70,9 +70,9 @@ jobs:
       - name: Install Node.js and dependencies
         uses: actions/setup-node@v3
         with:
-          node-version: '16.x'
-          registry-url: 'https://npm.pkg.github.com/'
-          scope: '@hmdlr'
+          node-version: "16.x"
+          registry-url: "https://npm.pkg.github.com/"
+          scope: "@hmdlr"
       - name: Install dependencies
         run: npm i
       - name: Build package
@@ -81,27 +81,3 @@ jobs:
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-
-  release-announcement:
-    needs: publish
-    runs-on: self-hosted
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: main
-
-      - name: get-package-version
-        run: |
-          echo "PACKAGE_VERSION=$(cat ${GITHUB_WORKSPACE}/package.json | jq -r .version)" >> $GITHUB_ENV ;
-          echo "PACKAGE_NAME=$(cat ${GITHUB_WORKSPACE}/package.json | jq -r .name)" >> $GITHUB_ENV ;
-
-      - name: Release Announcement
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.TELEGRAM_TO }}
-          token: ${{ secrets.TELEGRAM_TOKEN }}
-          message: |
-            😼New utils artifact published😼
-            Artifact: ${{ env.PACKAGE_NAME }}@${{ env.PACKAGE_VERSION }}
-            🚨${{ github.event.commits[0].message }}🚨
