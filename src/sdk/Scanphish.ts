@@ -3,36 +3,49 @@ import {
   buildPagedRequest,
   Collection,
   IBrand,
-  IBrandCreatePayload, IBrandUpdatePayload,
+  IBrandCreatePayload,
+  IBrandUpdatePayload,
   IConfig,
   IConfigCreatePayload,
   PagedRequest,
-  PagedResults, WebsiteInfo
-} from '@hmdlr/types';
-import FormData from 'form-data';
+  PagedResults,
+  WebsiteInfo,
+} from "@hmdlr/types";
+import FormData from "form-data";
 
 export default class Scanphish {
-  private readonly api = 'api';
+  private readonly api = "api";
 
   private readonly configsApi = `${this.api}/config`;
 
   private readonly scanApi = `${this.api}/scan`;
 
-  constructor(
-    private client: BareClient
-  ) {
-  }
+  constructor(private client: BareClient) {}
 
   /* ===================== */
 
   /* Scans */
-  public async scan(
-    collection: Collection
-  ): Promise<any> {
-    return this.client.post<any>(
-      `${this.scanApi}`,
-      collection
-    );
+  public async scan(collection: Collection): Promise<any> {
+    return this.client.post<any>(`${this.scanApi}`, collection);
+  }
+
+  /**
+   * Reports a website
+   */
+  public async report({
+    url,
+    wrong,
+    suspect,
+  }: {
+    url: string;
+    wrong?: boolean;
+    suspect?: boolean;
+  }): Promise<void> {
+    return this.client.post<void>(`${this.scanApi}/report`, {
+      url,
+      wrong,
+      suspect,
+    });
   }
 
   /* ===================== */
@@ -45,46 +58,38 @@ export default class Scanphish {
    * @returns {Promise<{candidates: string[]}>} A list of possible logos
    */
   public async enhanceBrand(brandId: string): Promise<{
-    candidates: string[]
+    candidates: string[];
   }> {
     return this.client.post<{
-      candidates: string[]
-    }>(
-      `${this.api}/brand/enhance/${brandId}`,
-      {}
-    );
+      candidates: string[];
+    }>(`${this.api}/brand/enhance/${brandId}`, {});
   }
 
   /**
    * Creates a new brand
    * @param brand
    */
-  public async createBrand(brand: IBrandCreatePayload): Promise<{ brand: IBrand }> {
-    return this.client.post<{ brand: IBrand }>(
-      `${this.api}/brand`,
-      brand
-    );
+  public async createBrand(
+    brand: IBrandCreatePayload,
+  ): Promise<{ brand: IBrand }> {
+    return this.client.post<{ brand: IBrand }>(`${this.api}/brand`, brand);
   }
 
   public async updateBrand(
     brandId: string,
-    payload: IBrandUpdatePayload
+    payload: IBrandUpdatePayload,
   ): Promise<{ brand: IBrand }> {
     return this.client.put<{ brand: IBrand }>(
       `${this.api}/brand/${brandId}`,
-      payload
+      payload,
     );
   }
 
   /**
    * Deletes a brand
    */
-  public async deleteBrand(
-    brandId: string
-  ): Promise<void> {
-    return this.client.delete<any>(
-      `${this.api}/brand/${brandId}`
-    );
+  public async deleteBrand(brandId: string): Promise<void> {
+    return this.client.delete<any>(`${this.api}/brand/${brandId}`);
   }
 
   /**
@@ -92,13 +97,13 @@ export default class Scanphish {
    * @param request
    * @param fromGroup
    */
-  public async listBrands(
-    request: PagedRequest,
-    fromGroup?: string
-  ) {
-    return this.client.get<PagedResults<IBrand>>(
-      `${this.api}/brand?${buildPagedRequest(request)}&fromGroup=${fromGroup}`
-    )
+  public async listBrands(request: PagedRequest, fromGroup?: string) {
+    return this.client
+      .get<PagedResults<IBrand>>(
+        `${this.api}/brand?${buildPagedRequest(
+          request,
+        )}&fromGroup=${fromGroup}`,
+      )
       .then(PagedResults.fromPagedJson as any);
   }
 
@@ -111,11 +116,14 @@ export default class Scanphish {
   public async searchBrands(
     request: PagedRequest,
     query: string,
-    fromGroup?: string
+    fromGroup?: string,
   ) {
-    return this.client.get<PagedResults<IBrand>>(
-      `${this.api}/brand/search?${buildPagedRequest(request)}&query=${query}&fromGroup=${fromGroup}`
-    )
+    return this.client
+      .get<PagedResults<IBrand>>(
+        `${this.api}/brand/search?${buildPagedRequest(
+          request,
+        )}&query=${query}&fromGroup=${fromGroup}`,
+      )
       .then(PagedResults.fromPagedJson as any);
   }
 
@@ -133,12 +141,17 @@ export default class Scanphish {
   public async listConfigs(
     request: PagedRequest,
     includeBrands = false,
-    forGroup?: string
+    forGroup?: string,
   ) {
-    return this.client.get<PagedResults<IConfig>>(
-      // eslint-disable-next-line max-len
-      `${this.configsApi}/?includeBrands=${includeBrands}&fromGroup=${forGroup}&${buildPagedRequest(request)}`
-    )
+    return this.client
+      .get<PagedResults<IConfig>>(
+        // eslint-disable-next-line max-len
+        `${
+          this.configsApi
+        }/?includeBrands=${includeBrands}&fromGroup=${forGroup}&${buildPagedRequest(
+          request,
+        )}`,
+      )
       .then(PagedResults.fromPagedJson as any);
   }
 
@@ -149,15 +162,12 @@ export default class Scanphish {
   public async createConfig(config: IConfigCreatePayload): Promise<IConfig> {
     // form data containing logo and name
     const formData = new FormData();
-    formData.append('name', config.name);
+    formData.append("name", config.name);
     if (config.logo) {
-      formData.append('logo', config.logo.buffer, 'logo');
+      formData.append("logo", config.logo.buffer, "logo");
     }
 
-    return this.client.post<IConfig>(
-      `${this.configsApi}`,
-      formData
-    );
+    return this.client.post<IConfig>(`${this.configsApi}`, formData);
   }
 
   /**
@@ -166,10 +176,9 @@ export default class Scanphish {
    * @param rulesets
    */
   public async addRulesetsToConfig(configId: string, rulesets: string[]) {
-    return this.client.put<void>(
-      `${this.configsApi}/${configId}/brands`,
-      { brands: rulesets }
-    );
+    return this.client.put<void>(`${this.configsApi}/${configId}/brands`, {
+      brands: rulesets,
+    });
   }
 
   /**
@@ -177,18 +186,14 @@ export default class Scanphish {
    * @param configId
    */
   public async getConfig(configId: string) {
-    return this.client.get<IConfig>(
-      `${this.configsApi}/${configId}`
-    );
+    return this.client.get<IConfig>(`${this.configsApi}/${configId}`);
   }
 
   /**
    * Returns a list of all the active configs the user has access to
    */
   public async listPresets() {
-    return this.client.get<IConfig[]>(
-      `${this.configsApi}/preset`
-    );
+    return this.client.get<IConfig[]>(`${this.configsApi}/preset`);
   }
 
   /**
@@ -196,10 +201,7 @@ export default class Scanphish {
    * @param configId
    */
   public async savePreset(configId: string) {
-    return this.client.post<void>(
-      `${this.configsApi}/preset`,
-      { configId }
-    );
+    return this.client.post<void>(`${this.configsApi}/preset`, { configId });
   }
 
   /**
@@ -207,9 +209,7 @@ export default class Scanphish {
    * @param configId
    */
   public async deletePreset(configId: string) {
-    return this.client.delete<void>(
-      `${this.configsApi}/preset/${configId}`
-    );
+    return this.client.delete<void>(`${this.configsApi}/preset/${configId}`);
   }
 
   /**
@@ -218,7 +218,7 @@ export default class Scanphish {
    */
   public async info(websiteDomain: string): Promise<WebsiteInfo> {
     return this.client.get<WebsiteInfo>(
-      `${this.scanApi}/info/${websiteDomain}`
+      `${this.scanApi}/info/${websiteDomain}`,
     );
   }
 }
