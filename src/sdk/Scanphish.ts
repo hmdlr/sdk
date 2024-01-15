@@ -194,6 +194,17 @@ export default class Scanphish {
   }
 
   /**
+   * Will remove the provided brands from the config
+   * @param configId
+   * @param brands
+   */
+  public async removeBrandsFromConfig(configId: string, brands: string[]) {
+    return this.client.delete<void>(`${this.configsApi}/${configId}/brands`, {
+      data: { brands },
+    });
+  }
+
+  /**
    * Returns a config
    * @param configId
    */
