@@ -7,6 +7,7 @@ import {
   IBrandUpdatePayload,
   IConfig,
   IConfigCreatePayload,
+  IConfigUpdatePayload,
   PagedRequest,
   PagedResults,
   WebsiteInfo,
@@ -168,6 +169,17 @@ export default class Scanphish {
     }
 
     return this.client.post<IConfig>(`${this.configsApi}`, formData);
+  }
+
+  /**
+   * Updates a config
+   * @param payload
+   */
+  public async updateConfig(payload: IConfigUpdatePayload): Promise<IConfig> {
+    return this.client.put<IConfig>(
+      `${this.configsApi}/${payload.id}`,
+      payload,
+    );
   }
 
   /**
