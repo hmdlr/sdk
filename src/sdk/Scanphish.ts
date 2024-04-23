@@ -7,6 +7,7 @@ import {
   IBrandUpdatePayload,
   IConfig,
   IConfigCreatePayload,
+  IConfigGroupDTO,
   IConfigUpdatePayload,
   PagedRequest,
   PagedResults,
@@ -100,11 +101,9 @@ export default class Scanphish {
    */
   public async listBrands(request: PagedRequest, fromGroup?: string) {
     return this.client
-      .get<PagedResults<IBrand>>(
-        `${this.api}/brand?${buildPagedRequest(
-          request,
-        )}&fromGroup=${fromGroup}`,
-      )
+      .get<
+        PagedResults<IBrand>
+      >(`${this.api}/brand?${buildPagedRequest(request)}&fromGroup=${fromGroup}`)
       .then(PagedResults.fromPagedJson as any);
   }
 
@@ -120,11 +119,9 @@ export default class Scanphish {
     fromGroup?: string,
   ) {
     return this.client
-      .get<PagedResults<IBrand>>(
-        `${this.api}/brand/search?${buildPagedRequest(
-          request,
-        )}&query=${query}&fromGroup=${fromGroup}`,
-      )
+      .get<
+        PagedResults<IBrand>
+      >(`${this.api}/brand/search?${buildPagedRequest(request)}&query=${query}&fromGroup=${fromGroup}`)
       .then(PagedResults.fromPagedJson as any);
   }
 
@@ -145,7 +142,7 @@ export default class Scanphish {
     forGroup?: string,
   ) {
     return this.client
-      .get<PagedResults<IConfig>>(
+      .get<PagedResults<IConfigGroupDTO>>(
         // eslint-disable-next-line max-len
         `${
           this.configsApi
@@ -209,7 +206,7 @@ export default class Scanphish {
    * @param configId
    */
   public async getConfig(configId: string) {
-    return this.client.get<IConfig>(`${this.configsApi}/${configId}`);
+    return this.client.get<IConfigGroupDTO>(`${this.configsApi}/${configId}`);
   }
 
   /**
