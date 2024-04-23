@@ -131,7 +131,7 @@ export default class Scanphish {
 
   /**
    * Returns a list of all the configs the user has access to
-   * If `forGroup` is provided, it will return the configs for that group if the user has access
+   * If `fromGroup` is provided, it will return the configs for that group if the user has access
    * @param request
    * @param includeBrands
    * @param forGroup
@@ -139,14 +139,14 @@ export default class Scanphish {
   public async listConfigs(
     request: PagedRequest,
     includeBrands = false,
-    forGroup?: string,
+    fromGroup?: string,
   ) {
     return this.client
       .get<PagedResults<IConfigGroupDTO>>(
         // eslint-disable-next-line max-len
         `${
           this.configsApi
-        }/?includeBrands=${includeBrands}&fromGroup=${forGroup}&${buildPagedRequest(
+        }/?includeBrands=${includeBrands}&fromGroup=${fromGroup}&${buildPagedRequest(
           request,
         )}`,
       )
