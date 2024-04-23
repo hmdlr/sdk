@@ -92,8 +92,10 @@ export default class Scanphish {
    * Returns a brand
    * @param brandId
    */
-  public async getBrand(brandId: string): Promise<IBrandGroupDTO> {
-    return this.client.get<IBrandGroupDTO>(`${this.api}/brand/${brandId}`);
+  public async getBrand(brandId: string): Promise<{ brand: IBrandGroupDTO }> {
+    return this.client.get<{ brand: IBrandGroupDTO }>(
+      `${this.api}/brand/${brandId}`,
+    );
   }
 
   /**
