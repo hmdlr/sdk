@@ -4,6 +4,7 @@ import {
   Collection,
   IBrand,
   IBrandCreatePayload,
+  IBrandGroupDTO,
   IBrandUpdatePayload,
   IConfig,
   IConfigCreatePayload,
@@ -85,6 +86,14 @@ export default class Scanphish {
       `${this.api}/brand/${brandId}`,
       payload,
     );
+  }
+
+  /**
+   * Returns a brand
+   * @param brandId
+   */
+  public async getBrand(brandId: string): Promise<IBrandGroupDTO> {
+    return this.client.get<IBrandGroupDTO>(`${this.api}/brand/${brandId}`);
   }
 
   /**
