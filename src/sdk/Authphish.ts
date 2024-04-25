@@ -89,4 +89,11 @@ export default class Authphish {
     );
     return result.hasAccess;
   }
+
+  public async canEditGroup(groupId: string): Promise<boolean> {
+    const result = await this.client.get<{ hasAccess: boolean }>(
+      `${this.groupsApi}/edit-group/${groupId}`
+    );
+    return result.hasAccess;
+  }
 }
